@@ -187,9 +187,9 @@ namespace LethalStreams
             CustomLogger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} loaded");
         }
         
+#if DEBUG
         public void Update()
         {
-            /*
             if (Keyboard.current[Key.P].wasPressedThisFrame)
             {
                 CustomLogger.Log("action");
@@ -229,8 +229,9 @@ namespace LethalStreams
             {
                 CustomLogger.Log("playing airhorn");
                 HUDManagerNetworkPatched.Instance.MakeAirHornNoiseServerRpc();
-            }*/
+            }
         }
+#endif
         
         void TransmitMessage(string message)
         {
