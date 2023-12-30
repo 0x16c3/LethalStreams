@@ -52,7 +52,7 @@ namespace LethalStreams
                 "General",
                 "StreamlabsToken",
                 "",
-                "Streamlabs token (leave empty for client mode)"
+                "Streamlabs Socket API token (leave empty for client mode)"
             );
             
             MaxCharacters = Config.Bind(
