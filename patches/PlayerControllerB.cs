@@ -117,13 +117,20 @@ namespace LethalStreams.Patches
 
         public static PlayerControllerBPatched GetCurrentPlayer(string username)
         {
-            PlayerControllerBPatched player;
+            PlayerControllerBPatched player = null;
             PlayerControllerBPatched localPlayer = GetLocalPlayer();
             if (username != null)
                 player = GetPlayer(username);
-            else
+            
+            if (player == null)
                 player = GetLocalPlayer();
 
+            if (player == null)
+            {
+                CustomLogger.LogError("Player is null!");
+                return null;
+            }
+            
             if (player._original.isPlayerDead)
                 player = GetSpectatedPlayer();
             
@@ -153,8 +160,11 @@ namespace LethalStreams.Patches
             
             foreach (var playerController in playerControllers)
             {
+                var networkObject = playerController.GetComponent<NetworkObject>();
+                
                 // if not spawned, skip
-                if (!playerController.GetComponent<NetworkObject>().IsSpawned 
+                if (!networkObject 
+                    || !networkObject.IsSpawned 
                     || playerController._original == null 
                     || !playerController._original.isPlayerControlled)
                     continue;

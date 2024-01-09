@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using UnityEngine;
 
 using LethalStreams.Patches;
@@ -11,8 +11,8 @@ namespace LethalStreams.Streamlabs
     {
         public static PlayerControllerBPatched FindUsernameInMessage(List<PlayerControllerBPatched> playerList, string message)
         {
-            // find username in message, ignore case
-            var username = playerList.Find(player => message.ToLower().Contains(player._original.playerUsername.ToLower()));
+            // find username in message, ignore case using firstordefault
+            var username = playerList.FirstOrDefault(player => message.IndexOf(player._original.playerUsername, StringComparison.OrdinalIgnoreCase) >= 0);
             return username;
         }
 
@@ -40,22 +40,27 @@ namespace LethalStreams.Streamlabs
         {
             CustomLogger.Log($"Bits received: {bits.message} - {bits.amount.ToString()} - {bits.name}");
 
-            bool InRange(int amount, Vector2Int range)
+            bool InRange(int amount, int rangeMin, int rangeMax)
             {
-                return amount >= range.x && amount <= range.y;
+                return amount >= rangeMin && amount < rangeMax;
             }
 
             List<PlayerControllerBPatched> players = PlayerControllerBPatched.GetAllPlayers();
-            string username = FindUsernameInMessage(players, bits.message)._original.playerUsername;
+            PlayerControllerBPatched user = FindUsernameInMessage(players, bits.message);
+            string username = PlayerControllerBPatched.GetLocalPlayer()._original.playerUsername;
+            if (user != null)
+                username = user._original.playerUsername;
 
+            CustomLogger.Log(username);
+            
             // if range is in bits, do action
-            if (InRange(bits.amount, Plugin.FlashlightDrainBitRange.Value))
+            if (InRange(bits.amount, Plugin.FlashlightDrainBitMin.Value, Plugin.FlashlightDrainBitMax.Value))
                 HUDManagerNetworkPatched.Instance.DrainFlashlightBatteryServerRpc(username);
-            else if (InRange(bits.amount, Plugin.StaminaDrainBitRange.Value))
+            else if (InRange(bits.amount, Plugin.StaminaDrainBitMin.Value, Plugin.StaminaDrainBitMax.Value))
                 HUDManagerNetworkPatched.Instance.DrainStaminaServerRpc(username);
-            else if (InRange(bits.amount, Plugin.Rotate180BitRange.Value))
+            else if (InRange(bits.amount, Plugin.Rotate180BitMin.Value, Plugin.Rotate180BitMax.Value))
                 HUDManagerNetworkPatched.Instance.Rotate180ServerRpc(username);
-            else if (InRange(bits.amount, Plugin.MaxSanityBitRange.Value))
+            else if (InRange(bits.amount, Plugin.MaxSanityBitMin.Value, Plugin.MaxSanityBitMax.Value))
                 HUDManagerNetworkPatched.Instance.SetMaxSanityServerRpc(username);
         }
         
@@ -64,11 +69,16 @@ namespace LethalStreams.Streamlabs
             CustomLogger.Log($"Subscription received: {sub.message} - {sub.name} - {sub.months}");
 
             List<PlayerControllerBPatched> players = PlayerControllerBPatched.GetAllPlayers();
-            string username = FindUsernameInMessage(players, sub.message)._original.playerUsername;
+            var user = FindUsernameInMessage(players, sub.message);
+            string username = PlayerControllerBPatched.GetLocalPlayer()._original.playerUsername;
+            if (user != null)
+                username = user._original.playerUsername;
 
+            CustomLogger.Log(username);
+            
             // if range is in bits, do action
             if (Plugin.PlayAirhornSub.Value)
-                HUDManagerNetworkPatched.Instance.SetMaxSanityServerRpc(username);
+                HUDManagerNetworkPatched.Instance.MakeAirHornNoiseServerRpc(username);
         }
     }
 

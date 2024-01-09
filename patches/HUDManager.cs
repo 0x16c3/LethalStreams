@@ -86,7 +86,11 @@ namespace LethalStreams.Patches
         public void DrainFlashlightBatteryClientRpc(string username = null)
         {
             CustomLogger.Log("DrainFlashlightBatteryClientRpc");
-            PlayerControllerBPatched.GetCurrentPlayer(username).DrainFlashlightBattery();
+            var player = PlayerControllerBPatched.GetCurrentPlayer(username);
+            if (player == null)
+                return;
+            
+            player.DrainFlashlightBattery();
         }
         
         [ServerRpc]
@@ -102,7 +106,12 @@ namespace LethalStreams.Patches
         public void DrainStaminaClientRpc(string username = null)
         {
             CustomLogger.Log("DrainStaminaClientRpc");
-            PlayerControllerBPatched.GetCurrentPlayer(username).DrainStamina();
+            
+            var player = PlayerControllerBPatched.GetCurrentPlayer(username);
+            if (player == null)
+                return;
+            
+            player.DrainStamina();
         }
         
         [ServerRpc]
@@ -118,7 +127,12 @@ namespace LethalStreams.Patches
         public void SetMaxSanityClientRpc(string username = null)
         {
             CustomLogger.Log("SetMaxSanityClientRpc");
-            PlayerControllerBPatched.GetCurrentPlayer(username).SetMaxSanity();
+            
+            var player = PlayerControllerBPatched.GetCurrentPlayer(username);
+            if (player == null)
+                return;
+            
+            player.SetMaxSanity();
         }
         
         [ServerRpc]
@@ -134,7 +148,12 @@ namespace LethalStreams.Patches
         public void Rotate180ClientRpc(string username = null)
         {
             CustomLogger.Log("Rotate180ClientRpc");
-            PlayerControllerBPatched.GetCurrentPlayer(username).Rotate180();
+            
+            var player = PlayerControllerBPatched.GetCurrentPlayer(username);
+            if (player == null)
+                return;
+            
+            player.Rotate180();
         }
 
         [ServerRpc]
@@ -155,7 +174,11 @@ namespace LethalStreams.Patches
             var airHorn = Resources.FindObjectsOfTypeAll<AudioClip>().FirstOrDefault(x => x.name == "AirHorn1");
 
             // play air horn sound effect
-            PlayerControllerBPatched.GetCurrentPlayer(username)._original.itemAudio.PlayOneShot(airHorn);
+            var player = PlayerControllerBPatched.GetCurrentPlayer(username);
+            if (player == null)
+                return;
+            
+            player._original.itemAudio.PlayOneShot(airHorn);
         }
         
         [ServerRpc]

@@ -14,6 +14,7 @@ using LethalStreams.Patches;
 using LethalStreams.Streamlabs;
 
 using Newtonsoft.Json.Linq;
+using Random = System.Random;
 
 namespace LethalStreams
 {
@@ -33,10 +34,14 @@ namespace LethalStreams
         public static ConfigEntry<int> MinDonationAmount { get; set; }
         public static ConfigEntry<string> DonationPrefix { get; set; }
         
-        public static ConfigEntry<Vector2Int> MaxSanityBitRange { get; set; }
-        public static ConfigEntry<Vector2Int> Rotate180BitRange { get; set; }
-        public static ConfigEntry<Vector2Int> StaminaDrainBitRange { get; set; }
-        public static ConfigEntry<Vector2Int> FlashlightDrainBitRange { get; set; }
+        public static ConfigEntry<int> MaxSanityBitMin { get; set; }
+        public static ConfigEntry<int> MaxSanityBitMax { get; set; }
+        public static ConfigEntry<int> Rotate180BitMin { get; set; }
+        public static ConfigEntry<int> Rotate180BitMax { get; set; }
+        public static ConfigEntry<int> StaminaDrainBitMin { get; set; }
+        public static ConfigEntry<int> StaminaDrainBitMax { get; set; }
+        public static ConfigEntry<int> FlashlightDrainBitMin { get; set; }
+        public static ConfigEntry<int> FlashlightDrainBitMax { get; set; }
         public static ConfigEntry<bool> PlayAirhornSub { get; set; }
         
         private void Awake()
@@ -83,32 +88,60 @@ namespace LethalStreams
                 "Prefix to trigger a donation message"
             );
             
-            MaxSanityBitRange = Config.Bind(
+            MaxSanityBitMin = Config.Bind(
                 "Bits",
-                "MaxSanityBitRange",
-                new Vector2Int(10, 50),
-                "Range of bits to set max sanity"
+                "MaxSanityBitMin",
+                10,
+                "Minimum bits to set max sanity"
             );
             
-            Rotate180BitRange = Config.Bind(
+            MaxSanityBitMax = Config.Bind(
                 "Bits",
-                "Rotate180BitRange",
-                new Vector2Int(50, 100),
-                "Range of bits to rotate 180"
+                "MaxSanityBitMax",
+                50,
+                "Maximum bits to set max sanity"
             );
             
-            StaminaDrainBitRange = Config.Bind(
+            Rotate180BitMin = Config.Bind(
                 "Bits",
-                "StaminaDrainBitRange",
-                new Vector2Int(100, 150),
-                "Range of bits to drain stamina"
+                "Rotate180BitMin",
+                50,
+                "Minimum bits to rotate 180"
             );
             
-            FlashlightDrainBitRange = Config.Bind(
+            Rotate180BitMax = Config.Bind(
                 "Bits",
-                "FlashlightDrainBitRange",
-                new Vector2Int(150, 9999),
-                "Range of bits to drain flashlight"
+                "Rotate180BitMax",
+                100,
+                "Maximum bits to rotate 180"
+            );
+            
+            StaminaDrainBitMin = Config.Bind(
+                "Bits",
+                "StaminaDrainBitMin",
+                100,
+                "Minimum bits to drain stamina"
+            );
+            
+            StaminaDrainBitMax = Config.Bind(
+                "Bits",
+                "StaminaDrainBitMax",
+                150,
+                "Maximum bits to drain stamina"
+            );
+            
+            FlashlightDrainBitMin = Config.Bind(
+                "Bits",
+                "FlashlightDrainBitMin",
+                150,
+                "Minimum bits to drain flashlight"
+            );
+            
+            FlashlightDrainBitMax = Config.Bind(
+                "Bits",
+                "FlashlightDrainBitMax",
+                99999,
+                "Maximum bits to drain flashlight"
             );
             
             PlayAirhornSub = Config.Bind(
@@ -139,7 +172,7 @@ namespace LethalStreams
             
             CustomLogger.Log($"Setting up streamlabs client");
             {
-                _socketManager.Spawn();
+                _socketManager = SocketManager.Spawn();
                 _socketManager.Setup();
 
                 if (!IsClient)
@@ -192,52 +225,73 @@ namespace LethalStreams
         {
             if (Keyboard.current[Key.P].wasPressedThisFrame)
             {
-                CustomLogger.Log("action");
-                TransmitMessage("test test test test");
+                Donation donation = new Donation()
+                {
+                    name = "test",
+                    amount = 100,
+                    message = "test message say: test"
+                };
+                StreamEvent.OnStreamDonation(donation);
             }
-            
+
+            Bits bits = new Bits()
+            {
+                name = "test",
+                amount = 10,
+                message = "test message"
+            };
+
             // drain flashlight if pressed o
             if (Keyboard.current[Key.O].wasPressedThisFrame)
             {
-                CustomLogger.Log("draining flashlight");
-                HUDManagerNetworkPatched.Instance.DrainFlashlightBatteryServerRpc();
+                bits.amount = FlashlightDrainBitMin.Value + 1;
+                if (new Random().Next(0, 2) == 0)
+                    bits.message = "emiru";
+
+                StreamEvent.OnStreamBits(bits);
             }
             
             // drain stamina if pressed l
             if (Keyboard.current[Key.L].wasPressedThisFrame)
             {
-                CustomLogger.Log("draining stamina");
-                HUDManagerNetworkPatched.Instance.DrainStaminaServerRpc();
+                bits.amount = StaminaDrainBitMin.Value + 1;
+                if (new Random().Next(0, 2) == 0)
+                    bits.message = "emiru";
+
+                StreamEvent.OnStreamBits(bits);
             }
             
             // set max sanity if pressed k
             if (Keyboard.current[Key.K].wasPressedThisFrame)
             {
-                CustomLogger.Log("setting max sanity");
-                HUDManagerNetworkPatched.Instance.SetMaxSanityServerRpc();
+                bits.amount = MaxSanityBitMin.Value + 1;
+                if (new Random().Next(0, 2) == 0)
+                    bits.message = "emiru";
+
+                StreamEvent.OnStreamBits(bits);
             }
             
             // rotate 180 if pressed j
             if (Keyboard.current[Key.J].wasPressedThisFrame)
             {
-                CustomLogger.Log("rotating 180");
-                HUDManagerNetworkPatched.Instance.Rotate180ServerRpc();
+                bits.amount = Rotate180BitMin.Value + 1;
+                if (new Random().Next(0, 2) == 0)
+                    bits.message = "emiru";
+
+                StreamEvent.OnStreamBits(bits);
             }
             
             // play airhorn if pressed h
             if (Keyboard.current[Key.H].wasPressedThisFrame)
             {
-                CustomLogger.Log("playing airhorn");
-                HUDManagerNetworkPatched.Instance.MakeAirHornNoiseServerRpc();
+                bits.amount = 1;
+                if (new Random().Next(0, 2) == 0)
+                    bits.message = "emiru";
+
+                StreamEvent.OnStreamBits(bits);
             }
         }
 #endif
-        
-        void TransmitMessage(string message)
-        {
-            CustomLogger.Log($"Transmitting message: {message}");
-            HUDManagerNetworkPatched.Instance.UseSignalTranslatorServerRpc(message);
-        }
     }
 
     internal static class CustomLogger

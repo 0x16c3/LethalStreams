@@ -12,15 +12,17 @@ A mod for your Twitch chat to integrate with your game.
 - Subscriptions:
   - Play air horn sound on a player's position.
 
+You can determine the amount of bits required for each event in the config file.
+
 ## Usage
 ### Donations
 If the viewer send a donation that has `say: <message>` in the message, the message will be sent to everyone in the game.
-> Example: `nice stream but we need to get to the next round. say:come back
+> Example: `nice stream but we need to get to the next round. say:come back`
 
 ### Bits
 If the viewer includes any of the players' names in their bit message, the event will only affect that player.<br/>
 If they don't include any names, the event will affect the streamer or if they're dead, the person that they are spectating.
-> Example: cheer1000 bye azumangadayilar flashlight
+> Example: `cheer1000 bye azumangadayilar flashlight`
 
 ### Subscriptions
 If the viewer includes any of the players' names in their subscription message, the air horn sound will play on that player's position.

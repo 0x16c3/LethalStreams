@@ -25,10 +25,11 @@ namespace LethalStreams
             IsLoaded = true;
         }
 
-        public void Spawn()
+        public static SocketManager Spawn()
         {
             var gameobject = new GameObject("SocketManager");
-            gameobject.AddComponent<SocketManager>();
+            var socketManager = gameobject.AddComponent<SocketManager>();
+            return socketManager;
         }
 
         public void Setup()
@@ -38,6 +39,7 @@ namespace LethalStreams
             {
                 isClient = true;
                 CustomLogger.Log("Using client mode");
+                Destroy(this);
                 return;
             }
 
