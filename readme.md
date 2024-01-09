@@ -16,7 +16,7 @@ You can determine the amount of bits required for each event in the config file.
 
 ## Usage
 ### Donations
-If the viewer send a donation that has `say: <message>` in the message, the message will be sent to everyone in the game.
+If the viewers send a donation that has `say: <message>` in the message, the message will be sent to everyone in the game.
 > Example: `nice stream but we need to get to the next round. say:come back`
 
 ### Bits

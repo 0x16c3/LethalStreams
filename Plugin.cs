@@ -284,11 +284,16 @@ namespace LethalStreams
             // play airhorn if pressed h
             if (Keyboard.current[Key.H].wasPressedThisFrame)
             {
-                bits.amount = 1;
+                Subscription sub = new Subscription()
+                {
+                    name = "test",
+                    message = "test message"
+                };
+                
                 if (new Random().Next(0, 2) == 0)
-                    bits.message = "emiru";
+                    sub.message = "emiru";
 
-                StreamEvent.OnStreamBits(bits);
+                StreamEvent.OnStreamSubscription(sub);
             }
         }
 #endif
