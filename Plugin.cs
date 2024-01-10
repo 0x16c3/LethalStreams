@@ -179,12 +179,24 @@ namespace LethalStreams
                 {
                     _socketManager.socket.OnAnyInUnityThread((name, response) =>
                     {
-                        JObject json = response.GetValue();
-                        string type = json.GetValue("type").ToString();
+                        JObject json;
+                        JObject message;
+                        string type;
+                        
+                        try
+                        {
+                            json = response.GetValue();
 
-                        // get streamevent from json 
-                        JArray message = (JArray)json.GetValue("message");
-
+                            var arr = (JArray)json.GetValue("message");
+                            message = (JObject)arr[0];
+                            type = json.GetValue("type").ToString();
+                        }
+                        catch (Exception)
+                        {
+                            CustomLogger.LogInfo("failed to parse event, ignoring");
+                            return;
+                        }
+                        
                         // check if type is any of the supported types (make them all lowercase using linq)
                         var supportedTypes = Enum.GetNames(typeof(StreamEventType)).Select(x => x.ToLower()).ToList();
                         if (supportedTypes.Contains(type))
@@ -195,15 +207,15 @@ namespace LethalStreams
                             switch (eventType)
                             {
                                 case StreamEventType.Donation:
-                                    Donation donation = message[0].ToObject<Donation>();
+                                    Donation donation = message.ToObject<Donation>();
                                     StreamEvent.OnStreamDonation(donation);
                                     break;
                                 case StreamEventType.Subscription:
-                                    Subscription subscription = message[0].ToObject<Subscription>();
+                                    Subscription subscription = message.ToObject<Subscription>();
                                     StreamEvent.OnStreamSubscription(subscription);
                                     break;
                                 case StreamEventType.Bits:
-                                    Bits bits = message[0].ToObject<Bits>();
+                                    Bits bits = message.ToObject<Bits>();
                                     StreamEvent.OnStreamBits(bits);
                                     break;
                                 case StreamEventType.Follow:

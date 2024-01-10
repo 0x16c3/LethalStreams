@@ -42,7 +42,7 @@ namespace LethalStreams.Streamlabs
 
             bool InRange(int amount, int rangeMin, int rangeMax)
             {
-                return amount >= rangeMin && amount < rangeMax;
+                return amount >= rangeMin && amount <= rangeMax;
             }
 
             List<PlayerControllerBPatched> players = PlayerControllerBPatched.GetAllPlayers();
