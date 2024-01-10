@@ -98,7 +98,7 @@ namespace LethalStreams
             MaxSanityBitMax = Config.Bind(
                 "Bits",
                 "MaxSanityBitMax",
-                50,
+                49,
                 "Maximum bits to set max sanity"
             );
             
@@ -112,7 +112,7 @@ namespace LethalStreams
             Rotate180BitMax = Config.Bind(
                 "Bits",
                 "Rotate180BitMax",
-                100,
+                99,
                 "Maximum bits to rotate 180"
             );
             
@@ -126,7 +126,7 @@ namespace LethalStreams
             StaminaDrainBitMax = Config.Bind(
                 "Bits",
                 "StaminaDrainBitMax",
-                150,
+                149,
                 "Maximum bits to drain stamina"
             );
             
